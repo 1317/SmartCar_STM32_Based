@@ -1,9 +1,9 @@
 
-// ADC 6Í¨µÀ²É¼¯ÊµÑé
+// ADC 6é€šé“é‡‡é›†å®éªŒ
 
 /**
- * @note	Òı½ÅÒÆÖ²ĞŞ¸Ä¼û bsp_adc.h ºÍ bsp_usart.h
- *				ÅäÖÃÒÆÖ²ĞŞ¸Ä¼û bsp_adc.h
+ * @note	å¼•è„šç§»æ¤ä¿®æ”¹è§ bsp_adc.h å’Œ bsp_usart.h
+ *				é…ç½®ç§»æ¤ä¿®æ”¹è§ bsp_adc.h
  */
 
 #include "stm32f10x.h"
@@ -11,30 +11,30 @@
 #include "bsp_adc.h"
 #include "Servo.h"
 #include "motor.h"
-// ADC1×ª»»µÄµçÑ¹ÖµÍ¨¹ıMDA·½Ê½´«µ½SRAM
+// ADC1è½¬æ¢çš„ç”µå‹å€¼é€šè¿‡MDAæ–¹å¼ä¼ åˆ°SRAM
 extern __IO uint16_t ADC_ConvertedValue[NOFCHANEL];
 
-// ¾Ö²¿±äÁ¿£¬ÓÃÓÚ±£´æ×ª»»¼ÆËãºóµÄµçÑ¹Öµ 	 
+// å±€éƒ¨å˜é‡ï¼Œç”¨äºä¿å­˜è½¬æ¢è®¡ç®—åçš„ç”µå‹å€¼ 	 
 float V[NOFCHANEL];        
 
-// Èí¼şÑÓÊ±
+// è½¯ä»¶å»¶æ—¶
 void Delay(__IO uint32_t nCount)
 {
   for(; nCount != 0; nCount--);
 } 
 
 /**
-  * @brief  Ö÷º¯Êı
-  * @param  ÎŞ
-  * @retval ÎŞ
+  * @brief  ä¸»å‡½æ•°
+  * @param  æ— 
+  * @retval æ— 
   */
 int main(void)
 {		
-	// ÅäÖÃ´®¿Ú
+	// é…ç½®ä¸²å£
 	USART_Config();
-	//TIM³õÊ¼»¯
+	//TIMåˆå§‹åŒ–
 	TIM_PWM_Init();	
-	// ADC ³õÊ¼»¯
+	// ADC åˆå§‹åŒ–
 	ADCx_Init();
 	tim_motor_init();
 	
@@ -43,62 +43,62 @@ int main(void)
 	int c=1;
 	double k;
 	
-	     motor_run(motor_1,90);//×óÂÖÕı×ª
-		  //motor_run(motor_2,100);//×óÂÖ·´×ª
-		  motor_run(motor_3,90);//ÓÒÂÖÕı×ª
-		  //motor_run(motor_4,100);//ÓÒÂÖ·´×ª
+	     motor_run(motor_1,90);//å·¦è½®æ­£è½¬
+		  //motor_run(motor_2,100);//å·¦è½®åè½¬
+		  motor_run(motor_3,90);//å³è½®æ­£è½¬
+		  //motor_run(motor_4,100);//å³è½®åè½¬
 	TIM_SetCompare2(TIM_SERVO,1790);
 	Delay(0x4affff);
 	TIM_SetCompare2(TIM_SERVO,1640);
 	Delay(0x35ffff);
 	
-	printf("\r\n ----ÕâÊÇÒ»¸öADC¶àÍ¨µÀ²É¼¯ÊµÑé----\r\n");
+	printf("\r\n ----è¿™æ˜¯ä¸€ä¸ªADCå¤šé€šé“é‡‡é›†å®éªŒ----\r\n");
 	
 	while (1)
 	{	
     
-			V[0] =(float) ADC_ConvertedValue[0]/4096*3.3;
-			V[1] =(float) ADC_ConvertedValue[1]/4096*3.3;
-			V[2] =(float) ADC_ConvertedValue[2]/4096*3.3;
-			V[3] =(float) ADC_ConvertedValue[3]/4096*3.3;
+		V[0] =(float) ADC_ConvertedValue[0]/4096*3.3;
+		V[1] =(float) ADC_ConvertedValue[1]/4096*3.3;
+		V[2] =(float) ADC_ConvertedValue[2]/4096*3.3;
+		V[3] =(float) ADC_ConvertedValue[3]/4096*3.3;
+		V[4] =(float) ADC_ConvertedValue[4]/4096*3.3;
+		//V[5] =(float) ADC_ConvertedValue[5]/4096*3.3;
+	
+		printf("\r\n CH0 value å³æ¨ª= %f V \r\n",V[0]);
+		printf("\r\n CH1 value å³ç›´= %f V \r\n",V[1]);
+		printf("\r\n CH2 value å·¦æ¨ª= %f V \r\n",V[2]);
+		printf("\r\n CH3 value å·¦ç›´= %f V \r\n",V[3]);
+		printf("\r\n CH4 value ä¸­æ¨ª= %f V \r\n",V[4]);
+		//printf("\r\n CH5 value = %f V \r\n",V[5]);
+		  
+		
+		k=(V[1]-V[3])/(V[1]+V[3]);
+		 printf("k=%f\r\n",k); //k=å½’ä¸€åŒ–å€¼
+		  
+		if(V[4]>2&&c%2==1)
+		{
+			
+		TIM_SetCompare2(TIM_SERVO,1783);
 			V[4] =(float) ADC_ConvertedValue[4]/4096*3.3;
-			//V[5] =(float) ADC_ConvertedValue[5]/4096*3.3;
-		
-			printf("\r\n CH0 value ÓÒºá= %f V \r\n",V[0]);
-			printf("\r\n CH1 value ÓÒÖ±= %f V \r\n",V[1]);
-			printf("\r\n CH2 value ×óºá= %f V \r\n",V[2]);
-			printf("\r\n CH3 value ×óÖ±= %f V \r\n",V[3]);
-			printf("\r\n CH4 value ÖĞºá= %f V \r\n",V[4]);
-			//printf("\r\n CH5 value = %f V \r\n",V[5]);
-		  
-		
-		  k=(V[1]-V[3])/(V[1]+V[3]);
-		  printf("k=%f\r\n",k); //
-		  
-				  if(V[4]>2&&c%2==1)
-				  {
-					  
-				    TIM_SetCompare2(TIM_SERVO,1783);
-						V[4] =(float) ADC_ConvertedValue[4]/4096*3.3;
-					  if(V[4]>=3.1)
-						n=1;
-					  if(V[4]<3&&n==1)
-					  {
-							TIM_SetCompare2(TIM_SERVO,1888);
-							Delay(0x3fffee);	
-							n=0;
-						}	
-						
-					}
+			if(V[4]>=3.1)
+			n=1;
+			if(V[4]<3&&n==1)
+			{
+				TIM_SetCompare2(TIM_SERVO,1888);
+				Delay(0x3fffee);	
+				n=0;
+			}	
+			
+		}
 					
 								
 						
-					
-//						TIM_SetCompare2(TIM_SERVO,1870);
-//						printf("\r\n CH4 value ÖĞºá= %f V \r\n",V[4]);
-//						Delay(0xffffee);
-//					}
-						
+			
+//			TIM_SetCompare2(TIM_SERVO,1870);
+//			printf("\r\n CH4 value ä¸­æ¨ª= %f V \r\n",V[4]);
+//			Delay(0xffffee);
+//			}
+				
 			
 //			if(V[4]>2&&n%2==0)
 //			{
@@ -108,16 +108,16 @@ int main(void)
 //				   TIM_SetCompare2(TIM_SERVO,1783);
 //					}
 //			}
-		  s=cs(k);
-		  printf ("s=%d\r\n",s);
-		  printf("\r\n\r\n");
-	    TIM_SetCompare2(TIM_SERVO,s2);//1950 1790 1630
-		  motor_run(motor_1,90);//×óÂÖÕı×ª
-		  //motor_run(motor_2,100);//×óÂÖ·´×ª
-		  motor_run(motor_3,90);//ÓÒÂÖÕı×ª
-		  //motor_run(motor_4,100);//ÓÒÂÖ·´×ª
-			Delay(0x000fff);		 
-		}	
+		s=cs(k);
+		printf ("s=%d\r\n",s);
+		printf("\r\n\r\n");
+	    TIM_SetCompare2(TIM_SERVO,s);//1950 1790 1630
+		motor_run(motor_1,90);//å·¦è½®æ­£è½¬
+		//motor_run(motor_2,100);//å·¦è½®åè½¬
+		motor_run(motor_3,90);//å³è½®æ­£è½¬
+		//motor_run(motor_4,100);//å³è½®åè½¬
+		Delay(0x000fff);		 
+	}	
 }
 /*********************************************END OF FILE**********************/
 
