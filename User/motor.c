@@ -1,75 +1,75 @@
 /*-----------------------------------------------------------------------------------------------------
-±àĞ´£º718´´ĞÂÊµÑéÊÒ
-Æ½Ì¨£ºSTM32F103ZET6
-¹¦ÄÜ£ºÊä³öPWM¿ØÖÆµç»ú
+ç¼–å†™ï¼š718åˆ›æ–°å®éªŒå®¤
+å¹³å°ï¼šSTM32F103ZET6
+åŠŸèƒ½ï¼šè¾“å‡ºPWMæ§åˆ¶ç”µæœº
 -------------------------------------------------------------------------------------------------------*/
 #include "motor.h"
 #include "stm32f10x.h"
 #include "stm32f10x_gpio.h"
 
 /**
-  * @brief	³õÊ¼»¯¸ß¼¶¶¨Ê±Æ÷TIM1
-  *	@param	ÎŞ
-  *	@retval ÎŞ
+  * @brief	åˆå§‹åŒ–é«˜çº§å®šæ—¶å™¨TIM1
+  *	@param	æ— 
+  *	@retval æ— 
   */
 void tim_motor_init()
 {
-	/*-------=------Êä³ö±È½ÏÍ¨µÀ1¡¢2¡¢3¡¢4µÄGPIO³õÊ¼»¯-------------*/
-	GPIO_InitTypeDef GPIO_InitStructure;														//ÉùÃ÷GPIO³õÊ¼»¯½á¹¹Ìå
+	/*-------=------è¾“å‡ºæ¯”è¾ƒé€šé“1ã€2ã€3ã€4çš„GPIOåˆå§‹åŒ–-------------*/
+	GPIO_InitTypeDef GPIO_InitStructure;														//å£°æ˜GPIOåˆå§‹åŒ–ç»“æ„ä½“
 
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOE, ENABLE);						//Ê¹ÄÜÖØÓ³ÉäIOÊ±ÖÓ
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOE, ENABLE);						//ä½¿èƒ½é‡æ˜ å°„IOæ—¶é’Ÿ
 	
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_11 
-																| GPIO_Pin_13 | GPIO_Pin_14;			//ÉèÖÃGPIO¹Ü½Å
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;									//¸´ÓÃÍÆÍìÊä³ö
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;								//ÉèÖÃÊä³öÆµÂÊ
-	GPIO_Init(GPIOE, &GPIO_InitStructure);													//³õÊ¼»¯GPIO
+																| GPIO_Pin_13 | GPIO_Pin_14;			//è®¾ç½®GPIOç®¡è„š
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;									//å¤ç”¨æ¨æŒ½è¾“å‡º
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;								//è®¾ç½®è¾“å‡ºé¢‘ç‡
+	GPIO_Init(GPIOE, &GPIO_InitStructure);													//åˆå§‹åŒ–GPIO
 	
-	/*----------------------Ê±»ù½á¹¹Ìå³õÊ¼»¯-----------------------*/
-	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;									//ÉùÃ÷¶¨Ê±Æ÷Ê±»ù½á¹¹Ìå
+	/*----------------------æ—¶åŸºç»“æ„ä½“åˆå§‹åŒ–-----------------------*/
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;									//å£°æ˜å®šæ—¶å™¨æ—¶åŸºç»“æ„ä½“
 	
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);	 					//Ê¹ÄÜÖØÓ³Éä¶¨Ê±Æ÷Ê±ÖÓ
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);	 					//ä½¿èƒ½é‡æ˜ å°„å®šæ—¶å™¨æ—¶é’Ÿ
 
-	/* ÅäÖÃÖÜÆÚ£¬ÕâÀïÅäÖÃÎª0.0005s¡£ÌáÊ¾£ºTout= ((arr+1)*(psc+1))/Tclk */
-	TIM_TimeBaseStructure.TIM_Period = 500-1;												//¶¨Ê±Æ÷ÖÜÆÚarr£¬¼´×Ô¶¯ÖØ×°ÔØ¼Ä´æÆ÷µÄÖµ
-																																	//ÀÛ¼ÆTIM_Period+1¸öÆµÂÊºó²úÉúÒ»¸ö¸üĞÂ»òÕßÖĞ¶Ï
-	TIM_TimeBaseStructure.TIM_Prescaler = 71;	 											//¶¨Ê±Æ÷Ô¤·ÖÆµÆ÷ÉèÖÃpsc£¬Ê±ÖÓÔ´¾­¸ÃÔ¤·ÖÆµÆ÷²ÅÊÇ¶¨Ê±Æ÷Ê±ÖÓ
-	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;					//Ê±ÖÓ·ÖÆµÒò×Ó£¬Êä³ö»¥²¹Âö³åÅäÖÃËÀÇøÊ±¼äĞèÒªÓÃµ½
-	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;			//¼ÆÊıÆ÷¼ÆÊıÄ£Ê½£¬ÉèÖÃÎªÏòÉÏ¼ÆÊı
-	TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;								//ÉèÖÃÖØ¸´¼ÆÊıÆ÷µÄÖµÎª0£¬²»ÉèÖÃÖØ¸´¼ÆÊı
-	TIM_TimeBaseInit(TIM1, &TIM_TimeBaseStructure);  								//³õÊ¼»¯¶¨Ê±Æ÷
+	/* é…ç½®å‘¨æœŸï¼Œè¿™é‡Œé…ç½®ä¸º0.0005sã€‚æç¤ºï¼šTout= ((arr+1)*(psc+1))/Tclk */
+	TIM_TimeBaseStructure.TIM_Period = 500-1;												//å®šæ—¶å™¨å‘¨æœŸarrï¼Œå³è‡ªåŠ¨é‡è£…è½½å¯„å­˜å™¨çš„å€¼
+																																	//ç´¯è®¡TIM_Period+1ä¸ªé¢‘ç‡åäº§ç”Ÿä¸€ä¸ªæ›´æ–°æˆ–è€…ä¸­æ–­
+	TIM_TimeBaseStructure.TIM_Prescaler = 71;	 											//å®šæ—¶å™¨é¢„åˆ†é¢‘å™¨è®¾ç½®pscï¼Œæ—¶é’Ÿæºç»è¯¥é¢„åˆ†é¢‘å™¨æ‰æ˜¯å®šæ—¶å™¨æ—¶é’Ÿ
+	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;					//æ—¶é’Ÿåˆ†é¢‘å› å­ï¼Œè¾“å‡ºäº’è¡¥è„‰å†²é…ç½®æ­»åŒºæ—¶é—´éœ€è¦ç”¨åˆ°
+	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;			//è®¡æ•°å™¨è®¡æ•°æ¨¡å¼ï¼Œè®¾ç½®ä¸ºå‘ä¸Šè®¡æ•°
+	TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;								//è®¾ç½®é‡å¤è®¡æ•°å™¨çš„å€¼ä¸º0ï¼Œä¸è®¾ç½®é‡å¤è®¡æ•°
+	TIM_TimeBaseInit(TIM1, &TIM_TimeBaseStructure);  								//åˆå§‹åŒ–å®šæ—¶å™¨
 
-	/*--------------------Êä³ö±È½Ï½á¹¹Ìå³õÊ¼»¯---------------------*/
-	TIM_OCInitTypeDef TIM_OCInitStructure;	 												//ÉùÃ÷¶¨Ê±Æ÷Êä³ö±È½Ï½á¹¹Ìå
+	/*--------------------è¾“å‡ºæ¯”è¾ƒç»“æ„ä½“åˆå§‹åŒ–---------------------*/
+	TIM_OCInitTypeDef TIM_OCInitStructure;	 												//å£°æ˜å®šæ—¶å™¨è¾“å‡ºæ¯”è¾ƒç»“æ„ä½“
 	
-	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;  							//Ñ¡Ôñ¶¨Ê±Æ÷Ä£Ê½:TIMÂö³å¿í¶Èµ÷ÖÆÄ£Ê½1
- 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;  	//Ê¹ÄÜÊä³ö±È½Ï
-	TIM_OCInitStructure.TIM_Pulse = 0;   														//ÉèÖÃ³õÊ¼Õ¼¿Õ±È
-	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;  			//Êä³ö¼«ĞÔ:TIMÊä³ö±È½Ï¼«ĞÔ¸ß(¸ßµçÆ½ÓĞĞ§)
+	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;  							//é€‰æ‹©å®šæ—¶å™¨æ¨¡å¼:TIMè„‰å†²å®½åº¦è°ƒåˆ¶æ¨¡å¼1
+ 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;  	//ä½¿èƒ½è¾“å‡ºæ¯”è¾ƒ
+	TIM_OCInitStructure.TIM_Pulse = 0;   														//è®¾ç½®åˆå§‹å ç©ºæ¯”
+	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;  			//è¾“å‡ºææ€§:TIMè¾“å‡ºæ¯”è¾ƒææ€§é«˜(é«˜ç”µå¹³æœ‰æ•ˆ)
 	
-	TIM_OC1Init(TIM1, &TIM_OCInitStructure);  											//³õÊ¼»¯Êä³ö±È½ÏÍ¨µÀ1
-	TIM_OC2Init(TIM1, &TIM_OCInitStructure);  											//³õÊ¼»¯Êä³ö±È½ÏÍ¨µÀ2
-	TIM_OC3Init(TIM1, &TIM_OCInitStructure);  											//³õÊ¼»¯Êä³ö±È½ÏÍ¨µÀ3
-	TIM_OC4Init(TIM1, &TIM_OCInitStructure);  											//³õÊ¼»¯Êä³ö±È½ÏÍ¨µÀ4
+	TIM_OC1Init(TIM1, &TIM_OCInitStructure);  											//åˆå§‹åŒ–è¾“å‡ºæ¯”è¾ƒé€šé“1
+	TIM_OC2Init(TIM1, &TIM_OCInitStructure);  											//åˆå§‹åŒ–è¾“å‡ºæ¯”è¾ƒé€šé“2
+	TIM_OC3Init(TIM1, &TIM_OCInitStructure);  											//åˆå§‹åŒ–è¾“å‡ºæ¯”è¾ƒé€šé“3
+	TIM_OC4Init(TIM1, &TIM_OCInitStructure);  											//åˆå§‹åŒ–è¾“å‡ºæ¯”è¾ƒé€šé“4
 	
-	TIM_OC1PreloadConfig(TIM1, TIM_OCPreload_Enable);  							//Ê¹ÄÜÍ¨µÀ1µÄCCR1ÉÏµÄÔ¤×°ÔØ¼Ä´æÆ÷
-	TIM_OC2PreloadConfig(TIM1, TIM_OCPreload_Enable);  							//Ê¹ÄÜÍ¨µÀ2µÄCCR2ÉÏµÄÔ¤×°ÔØ¼Ä´æÆ÷
-	TIM_OC3PreloadConfig(TIM1, TIM_OCPreload_Enable);  							//Ê¹ÄÜÍ¨µÀ3µÄCCR3ÉÏµÄÔ¤×°ÔØ¼Ä´æÆ÷
-	TIM_OC4PreloadConfig(TIM1, TIM_OCPreload_Enable);  							//Ê¹ÄÜÍ¨µÀ4µÄCCR4ÉÏµÄÔ¤×°ÔØ¼Ä´æÆ÷
+	TIM_OC1PreloadConfig(TIM1, TIM_OCPreload_Enable);  							//ä½¿èƒ½é€šé“1çš„CCR1ä¸Šçš„é¢„è£…è½½å¯„å­˜å™¨
+	TIM_OC2PreloadConfig(TIM1, TIM_OCPreload_Enable);  							//ä½¿èƒ½é€šé“2çš„CCR2ä¸Šçš„é¢„è£…è½½å¯„å­˜å™¨
+	TIM_OC3PreloadConfig(TIM1, TIM_OCPreload_Enable);  							//ä½¿èƒ½é€šé“3çš„CCR3ä¸Šçš„é¢„è£…è½½å¯„å­˜å™¨
+	TIM_OC4PreloadConfig(TIM1, TIM_OCPreload_Enable);  							//ä½¿èƒ½é€šé“4çš„CCR4ä¸Šçš„é¢„è£…è½½å¯„å­˜å™¨
 	
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);						//Ê¹ÄÜAFIO¸´ÓÃÊ±ÖÓ
-	GPIO_PinRemapConfig(GPIO_FullRemap_TIM1, ENABLE);								//¿ªÆôÖØÓ³Éä
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);						//ä½¿èƒ½AFIOå¤ç”¨æ—¶é’Ÿ
+	GPIO_PinRemapConfig(GPIO_FullRemap_TIM1, ENABLE);								//å¼€å¯é‡æ˜ å°„
 	
-	TIM_Cmd(TIM1, ENABLE);   																				//Ê¹ÄÜTIM
-	TIM_ARRPreloadConfig(TIM1, ENABLE); 														//Ê¹ÄÜTIM1ÔÚARRÉÏµÄÔ¤×°ÔØ¼Ä´æÆ÷
-	TIM_CtrlPWMOutputs(TIM1, ENABLE);   														//Ö÷Êä³öÊ¹ÄÜ£¬µ±Ê¹ÓÃµÄÊÇÍ¨ÓÃ¶¨Ê±Æ÷£¬²»ĞèÒªÖ÷Êä³öÊ¹ÄÜ
+	TIM_Cmd(TIM1, ENABLE);   																				//ä½¿èƒ½TIM
+	TIM_ARRPreloadConfig(TIM1, ENABLE); 														//ä½¿èƒ½TIM1åœ¨ARRä¸Šçš„é¢„è£…è½½å¯„å­˜å™¨
+	TIM_CtrlPWMOutputs(TIM1, ENABLE);   														//ä¸»è¾“å‡ºä½¿èƒ½ï¼Œå½“ä½¿ç”¨çš„æ˜¯é€šç”¨å®šæ—¶å™¨ï¼Œä¸éœ€è¦ä¸»è¾“å‡ºä½¿èƒ½
 }
 
 /**
-  * @brief	µç»ú¿ØÖÆ
-  *	@param	motor_num:¿ÉÒÔÌîÈëmotor_1/motor_2/motor_3/motor_4À´Ñ¡Ôñ¿ØÖÆµç»ú1/2/3/4
-  *	@param	speed_set:PWM¸ßµçÆ½µÄÊ±¼ä¡£¿ÉÒÔÌîÈëËÙ¶ÈÉè¶¨ÖµÀ´¿ØÖÆµç»ú×ªËÙ.·¶Î§0-500
-  *	@retval ÎŞ
+  * @brief	ç”µæœºæ§åˆ¶
+  *	@param	motor_num:å¯ä»¥å¡«å…¥motor_1/motor_2/motor_3/motor_4æ¥é€‰æ‹©æ§åˆ¶ç”µæœº1/2/3/4
+  *	@param	speed_set:PWMé«˜ç”µå¹³çš„æ—¶é—´ã€‚å¯ä»¥å¡«å…¥é€Ÿåº¦è®¾å®šå€¼æ¥æ§åˆ¶ç”µæœºè½¬é€Ÿ.èŒƒå›´0-500
+  *	@retval æ— 
   */
 void motor_run(int motor_num,int speed_set)
 {
